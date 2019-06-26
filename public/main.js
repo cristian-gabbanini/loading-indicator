@@ -4394,9 +4394,7 @@ var elm$core$Process$sleep = _Process_sleep;
 var author$project$Loading$waitMs = function (delay) {
 	return elm$core$Process$sleep(delay);
 };
-var author$project$Main$IsTakingTooLong = function (a) {
-	return {$: 'IsTakingTooLong', a: a};
-};
+var author$project$Main$IsTakingTooLong = {$: 'IsTakingTooLong'};
 var author$project$Main$Wait = {$: 'Wait'};
 var elm$core$Basics$identity = function (x) {
 	return x;
@@ -4946,20 +4944,20 @@ var elm$core$Task$perform = F2(
 	});
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{showLoader: author$project$Main$Wait},
+		author$project$Main$Wait,
 		A2(
 			elm$core$Task$perform,
-			author$project$Main$IsTakingTooLong,
-			author$project$Loading$waitMs(500)));
+			function (_n1) {
+				return author$project$Main$IsTakingTooLong;
+			},
+			author$project$Loading$waitMs(600)));
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
-var author$project$Main$Completed = function (a) {
-	return {$: 'Completed', a: a};
-};
+var author$project$Main$Completed = {$: 'Completed'};
 var author$project$Main$Done = {$: 'Done'};
 var author$project$Main$Show = {$: 'Show'};
 var elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -4968,19 +4966,15 @@ var author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'IsTakingTooLong') {
 			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{showLoader: author$project$Main$Show}),
+				author$project$Main$Show,
 				A2(
 					elm$core$Task$perform,
-					author$project$Main$Completed,
+					function (_n1) {
+						return author$project$Main$Completed;
+					},
 					author$project$Loading$waitMs(4500)));
 		} else {
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{showLoader: author$project$Main$Done}),
-				elm$core$Platform$Cmd$none);
+			return _Utils_Tuple2(author$project$Main$Done, elm$core$Platform$Cmd$none);
 		}
 	});
 var elm$json$Json$Decode$map = _Json_map1;
@@ -5008,7 +5002,7 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
-var author$project$Main$viewLoader = A2(
+var author$project$Loading$viewLoader = A2(
 	elm$html$Html$div,
 	_List_fromArray(
 		[
@@ -5022,12 +5016,11 @@ var author$project$Main$viewLoader = A2(
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var author$project$Main$view = function (model) {
-	var _n0 = model.showLoader;
-	switch (_n0.$) {
+	switch (model.$) {
 		case 'Wait':
 			return elm$html$Html$text('Waiting for loading to take more than 500ms');
 		case 'Show':
-			return author$project$Main$viewLoader;
+			return author$project$Loading$viewLoader;
 		default:
 			return elm$html$Html$text('Loading complete');
 	}

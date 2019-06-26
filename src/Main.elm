@@ -3,23 +3,30 @@ module Main exposing (main)
 import Browser exposing (element)
 import Html exposing (..)
 import Html.Attributes exposing (class)
-import Loading exposing (waitMs)
+import Http exposing (Error)
+import Loading exposing (httpGet, viewLoader, waitMs)
 import Task exposing (perform)
 
 
 type Msg
-    = IsTakingTooLong ()
-    | Completed ()
+    = IsTakingTooLong
+    | Completed
 
 
-type LoadingIndicator
+type Model
     = Wait
     | Show
     | Done
 
 
-type alias Model =
-    { showLoader : LoadingIndicator }
+requestHandler : Result Http.Error String -> Msg
+requestHandler expect =
+    case expect of
+        Err message ->
+            IsTakingTooLong
+
+        Ok st ->
+            IsTakingTooLong
 
 
 
@@ -29,11 +36,11 @@ type alias Model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        IsTakingTooLong () ->
-            ( { model | showLoader = Show }, perform Completed (waitMs 4500) )
+        IsTakingTooLong ->
+            ( Show, perform (\_ -> Completed) (waitMs 4500) )
 
-        Completed () ->
-            ( { model | showLoader = Done }, Cmd.none )
+        Completed ->
+            ( Done, Cmd.none )
 
 
 
@@ -42,7 +49,7 @@ update msg model =
 
 init : String -> ( Model, Cmd Msg )
 init _ =
-    ( { showLoader = Wait }, perform IsTakingTooLong (waitMs 500) )
+    ( Wait, perform (\_ -> IsTakingTooLong) (waitMs 600) )
 
 
 
@@ -58,17 +65,9 @@ subscriptions model =
 -- VIEW
 
 
-viewLoader : Html Msg
-viewLoader =
-    div [ class "lds-ripple" ]
-        [ div [] []
-        , div [] []
-        ]
-
-
 view : Model -> Html Msg
 view model =
-    case model.showLoader of
+    case model of
         Wait ->
             text "Waiting for loading to take more than 500ms"
 
